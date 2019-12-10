@@ -1,0 +1,12 @@
+[package]
+name = "eddie-js"
+version = "0.1.0"
+authors = ["Ilia Schelokov <thaumant@gmail.com>"]
+edition = "2018"
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+eddie = { git = "https://github.com/thaumant/eddie", branch = "generic" }
+wasm-bindgen = "0.2"
