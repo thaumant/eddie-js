@@ -7,8 +7,7 @@
     "build": "npm run cleanup && npm run cargo && cp target/wasm32-unknown-unknown/release/eddie_js.wasm build/eddie.wasm",
     "cargo": "cargo build --target wasm32-unknown-unknown --release",
     "cleanup": "rm -rf build/*",
-    "test": "node ./node_modules/.bin/jest",
-    "rawbuild": "cargo build --target wasm32-unknown-unknown --release && cp target/wasm32-unknown-unknown/release/eddie_js.wasm test"
+    "test": "node ./node_modules/.bin/jest"
   },
   "author": "Ilia Schelokov <thaumant@gmail.com>",
   "license": "MIT",

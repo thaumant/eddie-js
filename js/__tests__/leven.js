@@ -45,5 +45,14 @@ describe('eddie', () => {
                 [4, 'もしもし', ''],
             ])
         })
+
+        test('growth', () => {
+            for (let len = 0; len <= 1000; len += 10) {
+                const a = ''.padEnd(len, 'a')
+                const b = ''.padEnd(len, 'b')
+                expect(eddie.levenshtein(a, b)).toBe(len)
+                expect(eddie.levenshtein(a, a)).toBe(0)
+            }
+        })
     })
 })

@@ -2,15 +2,15 @@
 # It is not intended for manual editing.
 [[package]]
 name = "eddie"
-version = "0.4.0"
+version = "0.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 
 [[package]]
 name = "eddie-js"
 version = "0.1.0"
 dependencies = [
- "eddie 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)",
+ "eddie 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)",
 ]
 
 [metadata]
-"checksum eddie 0.4.0 (registry+https://github.com/rust-lang/crates.io-index)" = "57ed3c4971872d2908b30fe7701e57164a31a8256c263697ea30686b2ba003be"
+"checksum eddie 0.4.1 (registry+https://github.com/rust-lang/crates.io-index)" = "0c41a0a9fb624179f56f4160584c8b4fd3a4555a459338b0068c87ce3d9a5e86"
