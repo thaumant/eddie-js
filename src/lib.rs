@@ -1,47 +1,59 @@
 use std::cell::RefCell;
-use wasm_bindgen::prelude::*;
-use eddie::{Levenshtein}; // , DamerauLevenshtein, Hamming, Jaro, JaroWinkler
+use eddie::slice::{Levenshtein, DamerauLevenshtein}; //, Hamming, Jaro, JaroWinkler
+
 
 thread_local! {
-    static STATE: RefCell<(Levenshtein<u32>, Vec<u32>, Vec<u32>)> = RefCell::new((
-        Levenshtein::new(),
+    static LEVEN: Levenshtein = Levenshtein::new();
+    static DAMLEV: DamerauLevenshtein<u32> = DamerauLevenshtein::new();
+
+    static BUFFERS: RefCell<(Vec<u32>, Vec<u32>)> = RefCell::new((
         Vec::with_capacity(100),
         Vec::with_capacity(100),
     ));
 }
 
-#[wasm_bindgen]
-pub fn levenshtein(len1: usize, len2: usize) -> usize {
-    STATE.with(|cell| {
-        let (lev, buffer1, buffer2) = &mut *cell.borrow_mut();
-        unsafe {
-            buffer1.set_len(len1);
-            buffer2.set_len(len2);
-        }
-        lev.distance(&buffer1[..], &buffer2[..])
+
+#[no_mangle]
+pub fn leven() -> usize {
+    BUFFERS.with(|cell| {
+        let (buffer1, buffer2) = &mut *cell.borrow_mut();
+        LEVEN.with(|lev| lev.distance(&buffer1[..], &buffer2[..]))
     })
 }
 
-#[wasm_bindgen]
-pub fn _levenshtein_get_capacity() -> usize {
-    STATE.with(|cell| {
-        let (_, buffer1, _) = &*cell.borrow();
-        buffer1.len()
+
+#[no_mangle]
+pub fn damlev() -> usize {
+    BUFFERS.with(|cell| {
+        let (buffer1, buffer2) = &mut *cell.borrow_mut();
+        DAMLEV.with(|damlev| damlev.distance(&buffer1[..], &buffer2[..]))
     })
 }
 
-#[wasm_bindgen]
-pub fn _levenshtein_get_ptr1() -> *mut u32  {
-    STATE.with(|cell| {
-        let (_, buffer1, _) = &mut *cell.borrow_mut();
+
+#[no_mangle]
+pub fn _get_ptr1() -> *mut u32  {
+    BUFFERS.with(|cell| {
+        let (buffer1, _) = &mut *cell.borrow_mut();
         buffer1.as_mut_ptr()
     })
 }
 
-#[wasm_bindgen]
-pub fn _levenshtein_get_ptr2() -> *mut u32  {
-    STATE.with(|cell| {
-        let (_, _, buffer2) = &mut *cell.borrow_mut();
+
+#[no_mangle]
+pub fn _get_ptr2() -> *mut u32  {
+    BUFFERS.with(|cell| {
+        let (_, buffer2) = &mut *cell.borrow_mut();
         buffer2.as_mut_ptr()
+    })
+}
+
+
+#[no_mangle]
+pub fn _set_len(len1: usize, len2: usize) {
+    BUFFERS.with(|cell| {
+        let (buffer1, buffer2) = &mut *cell.borrow_mut();
+        buffer1.resize(len1, 0);
+        buffer2.resize(len2, 0);
     })
 }

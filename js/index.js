@@ -1,33 +1,50 @@
 const fs = require('fs')
 
-const wasmSource   = fs.readFileSync(__dirname + '/../build/eddie_js_bg.wasm')
-const wasmModule   = new WebAssembly.Module(wasmSource)
-const wasmInstance = new WebAssembly.Instance(wasmModule, {})
-const wasm         = wasmInstance.exports
+const wasmModule   = new WebAssembly.Module(fs.readFileSync(__dirname + '/../build/eddie.wasm'))
+const wasmImports  = {env: {memory: new WebAssembly.Memory({initial: 16})}}
+const wasmInstance = new WebAssembly.Instance(wasmModule, wasmImports)
 
-const MAX_CAPACITY = 100
 
-let mem32   = new Uint32Array(wasm.memory.buffer)
-let ptr1    = wasm._levenshtein_get_ptr1()
-let ptr2    = wasm._levenshtein_get_ptr2()
-let offset1 = ptr1 / 4
-let offset2 = ptr2 / 4
+let MEM32   = new Uint32Array(0)
+let STR1    = ''
+let STR2    = ''
+let LEN1    = 0
+let LEN2    = 0
+let OFFSET1 = 0
+let OFFSET2 = 0
 
-exports.levenshtein = function levenshtein(s1, s2) {
-    if (mem32.buffer !== wasm.memory.buffer) {
-        mem32   = new Uint32Array(wasm.memory.buffer)
-        ptr1    = wasm._levenshtein_get_ptr1()
-        ptr2    = wasm._levenshtein_get_ptr2()
-        offset1 = ptr1 / 4
-        offset2 = ptr2 / 4
+
+function passArgs(s1, s2) {
+    if (true && (s1.length !== LEN1 || s2.length !== LEN2)) {
+        LEN1 = s1.length;
+        LEN2 = s2.length;
+        wasmInstance.exports._set_len(LEN1, LEN2)
     }
 
-    const len1 = Math.min(s1.length, MAX_CAPACITY)
-    const len2 = Math.min(s2.length, MAX_CAPACITY)
+    if (true && (MEM32.buffer !== wasmInstance.exports.memory.buffer)) {
+        MEM32   = new Uint32Array(wasmInstance.exports.memory.buffer)
+        OFFSET1 = wasmInstance.exports._get_ptr1() / 4
+        OFFSET2 = wasmInstance.exports._get_ptr2() / 4
+    }
 
-    for (let i = 0; i < len1; i++) mem32[i + offset1] = s1.codePointAt(i)
-    for (let i = 0; i < len2; i++) mem32[i + offset2] = s2.codePointAt(i)
+    if (true && (s1 !== STR1)) {
+        STR1 = s1
+        for (let i = 0; i < LEN1; i++) {
+            MEM32[i + OFFSET1] = s1.codePointAt(i)
+        }
+    }
 
-    const out = wasm.levenshtein(len1, len2)
+    if (true && (s2 !== STR2)) {
+        STR2 = s2
+        for (let i = 0; i < LEN2; i++) {
+            MEM32[i + OFFSET2] = s2.codePointAt(i)
+        }
+    }
+}
+
+
+exports.levenshtein = function levenshtein(s1, s2) {
+    passArgs(s1, s2)
+    const out = wasmInstance.exports.leven()
     return out
 }

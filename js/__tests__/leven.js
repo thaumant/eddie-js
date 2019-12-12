@@ -1,15 +1,15 @@
-const {levenshtein} = require('..')
-
-function check(fn, sample) {
-    for (const [dist, s1, s2] of sample) {
-        expect(fn(s1, s2)).toBe(dist)
-    }
-}
+const eddie = require('..')
 
 describe('eddie', () => {
     describe('levenshtein', () => {
+        function check(fn, sample) {
+            for (const [dist, s1, s2] of sample) {
+                expect(fn(s1, s2)).toBe(dist)
+            }
+        }
+
         test('basics', () => {
-            check(levenshtein, [
+            check(eddie.levenshtein, [
                 [0, '',  ''],
                 [1, 'a', ''],
                 [1, '',  'b'],
@@ -18,7 +18,7 @@ describe('eddie', () => {
         })
 
         test('mixed', () => {
-            check(levenshtein, [
+            check(eddie.levenshtein, [
                 [3, 'ca',        'abc'],
                 [3, 'a tc',      'a cat'],
                 [4, 'a cat',     'an abct'],
@@ -35,7 +35,7 @@ describe('eddie', () => {
         })
 
         test('unicode', () => {
-            check(levenshtein, [
+            check(eddie.levenshtein, [
                 [1, 'もしもし', 'もしもしし'],
                 [0, 'もしもし', 'もしもし'],
                 [1, 'もしもし', 'もしまし'],

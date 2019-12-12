@@ -4,11 +4,11 @@
   "description": "Fast and well-tested Rust+WASM implementations of edit distance/string similarity metrics: Levenshtein, Damerau-Levenshtein, Hamming, Jaro, and Jaro-Winkler.",
   "main": "index.js",
   "scripts": {
-    "build": "npm run cleanup && npm run cargo && npm run bindgen",
+    "build": "npm run cleanup && npm run cargo && cp target/wasm32-unknown-unknown/release/eddie_js.wasm build/eddie.wasm",
     "cargo": "cargo build --target wasm32-unknown-unknown --release",
-    "bindgen": "wasm-bindgen target/wasm32-unknown-unknown/release/eddie_js.wasm --out-dir ./build --nodejs",
-    "cleanup": "rm -rf build",
-    "test": "node ./node_modules/.bin/jest"
+    "cleanup": "rm -rf build/*",
+    "test": "node ./node_modules/.bin/jest",
+    "rawbuild": "cargo build --target wasm32-unknown-unknown --release && cp target/wasm32-unknown-unknown/release/eddie_js.wasm test"
   },
   "author": "Ilia Schelokov <thaumant@gmail.com>",
   "license": "MIT",
