@@ -14,7 +14,7 @@ thread_local! {
 
 
 #[no_mangle]
-pub fn leven() -> usize {
+pub fn _leven() -> usize {
     BUFFERS.with(|cell| {
         let (buffer1, buffer2) = &mut *cell.borrow_mut();
         LEVEN.with(|lev| lev.distance(&buffer1[..], &buffer2[..]))
@@ -23,7 +23,7 @@ pub fn leven() -> usize {
 
 
 #[no_mangle]
-pub fn damlev() -> usize {
+pub fn _damlev() -> usize {
     BUFFERS.with(|cell| {
         let (buffer1, buffer2) = &mut *cell.borrow_mut();
         DAMLEV.with(|damlev| damlev.distance(&buffer1[..], &buffer2[..]))
