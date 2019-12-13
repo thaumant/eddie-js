@@ -10,6 +10,9 @@ const {
     _get_ptr1,
     _get_ptr2,
     _leven,
+    _damlev,
+    _jaro,
+    _jarwin,
 } = wasmExports
 
 
@@ -22,12 +25,12 @@ let OFFSET1 = 0
 let OFFSET2 = 0
 
 
-function passArgs(s1, s2) {
+function passStrings(str1, str2) {
     let updateOffsets = false
 
-    if (s1.length !== STR1.length || s2.length !== STR2.length) {
-        _set_len(s1.length, s2.length)
-        updateOffsets = true
+    if (str1.length !== LEN1 || str2.length !== LEN2) {
+        _set_len(str1.length, str2.length)
+        updateOffsets = str1.length > LEN1 || str2.length > LEN2
     }
 
     if (MEM32.buffer !== wasmExports.memory.buffer) {
@@ -40,24 +43,34 @@ function passArgs(s1, s2) {
         OFFSET2 = _get_ptr2() / 4
     }
 
-    if (s1 !== STR1) {
-        for (let i = 0; i < s1.length; i++) {
-            MEM32[i + OFFSET1] = s1.codePointAt(i)
+    if (str1.length !== LEN1 || str1 !== STR1) {
+        for (let i = 0; i < str1.length; i++) {
+            MEM32[i + OFFSET1] = str1.charCodeAt(i)
         }
-        STR1 = s1
     }
 
-    if (s2 !== STR2) {
-        for (let i = 0; i < s2.length; i++) {
-            MEM32[i + OFFSET2] = s2.codePointAt(i)
+    if (str2.length !== LEN2 || str2 !== STR2) {
+        for (let i = 0; i < str2.length; i++) {
+            MEM32[i + OFFSET2] = str2.charCodeAt(i)
         }
-        STR2 = s2
     }
+
+    STR1 = str1
+    STR2 = str2
 }
 
 
-exports.levenshtein = function levenshtein(s1, s2) {
-    passArgs(s1, s2)
-    const out = _leven()
+function compare(str1, str2, defaultVal, wasmFn) {
+    if (str1.length === str2.length && str1 === str2) {
+        return defaultVal
+    }
+    passStrings(str1, str2)
+    const out = wasmFn()
     return out
 }
+
+
+exports.leven  = (s1, s2) => compare(s1, s2, 0,   _leven)
+exports.damlev = (s1, s2) => compare(s1, s2, 0,   _damlev)
+exports.jaro   = (s1, s2) => compare(s1, s2, 1.0, _jaro)
+exports.jarwin = (s1, s2) => compare(s1, s2, 1.0, _jarwin)

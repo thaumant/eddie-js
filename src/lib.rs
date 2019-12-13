@@ -1,10 +1,12 @@
 use std::cell::RefCell;
-use eddie::slice::{Levenshtein, DamerauLevenshtein}; //, Hamming, Jaro, JaroWinkler
+use eddie::slice::{Levenshtein, DamerauLevenshtein, Jaro, JaroWinkler};
 
 
 thread_local! {
     static LEVEN: Levenshtein = Levenshtein::new();
     static DAMLEV: DamerauLevenshtein<u32> = DamerauLevenshtein::new();
+    static JARO: Jaro = Jaro::new();
+    static JARWIN: JaroWinkler = JaroWinkler::new();
 
     static BUFFERS: RefCell<(Vec<u32>, Vec<u32>)> = RefCell::new((
         Vec::with_capacity(100),
@@ -27,6 +29,24 @@ pub fn _damlev() -> usize {
     BUFFERS.with(|cell| {
         let (buffer1, buffer2) = &mut *cell.borrow_mut();
         DAMLEV.with(|damlev| damlev.distance(&buffer1[..], &buffer2[..]))
+    })
+}
+
+
+#[no_mangle]
+pub fn _jaro() -> f64 {
+    BUFFERS.with(|cell| {
+        let (buffer1, buffer2) = &mut *cell.borrow_mut();
+        JARO.with(|jaro| jaro.similarity(&buffer1[..], &buffer2[..]))
+    })
+}
+
+
+#[no_mangle]
+pub fn _jarwin() -> f64 {
+    BUFFERS.with(|cell| {
+        let (buffer1, buffer2) = &mut *cell.borrow_mut();
+        JARWIN.with(|jarwin| jarwin.similarity(&buffer1[..], &buffer2[..]))
     })
 }
 

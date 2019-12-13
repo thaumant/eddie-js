@@ -6,9 +6,9 @@ function check(fn, sample) {
     }
 }
 
-describe('leven', () => {
+describe('damlev', () => {
     test('basics', () => {
-        check(eddie.leven, [
+        check(eddie.damlev, [
             [0, '',  ''],
             [1, 'a', ''],
             [1, '',  'b'],
@@ -17,14 +17,14 @@ describe('leven', () => {
     })
 
     test('mixed', () => {
-        check(eddie.leven, [
-            [3, 'ca',        'abc'],
-            [3, 'a tc',      'a cat'],
-            [4, 'a cat',     'an abct'],
+        check(eddie.damlev, [
+            [2, 'ca',        'abc'],
+            [2, 'a tc',      'a cat'],
+            [3, 'a cat',     'an abct'],
             [2, 'crate',     'trace'],
             [2, 'captain',   'ptain'],
             [2, 'dwayne',    'duane'],
-            [2, 'martha',    'marhta'],
+            [1, 'martha',    'marhta'],
             [3, 'kitten',    'sitting'],
             [6, 'mailbox',   'boxmail'],
             [3, 'mailbox',   'alimbox'],
@@ -34,7 +34,7 @@ describe('leven', () => {
     })
 
     test('unicode', () => {
-        check(eddie.leven, [
+        check(eddie.damlev, [
             [1, 'もしもし', 'もしもしし'],
             [0, 'もしもし', 'もしもし'],
             [1, 'もしもし', 'もしまし'],
@@ -49,8 +49,8 @@ describe('leven', () => {
         for (let len = 1; len <= 1001; len += 10) {
             const a = ''.padEnd(len, 'a')
             const b = ''.padEnd(len, 'b')
-            expect(eddie.leven(a, b)).toBe(len)
-            expect(eddie.leven(a, a)).toBe(0)
+            expect(eddie.damlev(a, b)).toBe(len)
+            expect(eddie.damlev(a, a)).toBe(0)
         }
     })
 })
