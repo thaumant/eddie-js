@@ -1,38 +1,11 @@
 const eddie = require('../js/')
 const leven = require('leven')
 const {Suite} = require('benchmark')
-
-
-const SAMPLE1 = [
-    ['a cat',     'an abct'],
-    ['crate',     'trace'],
-    ['captain',   'ptain'],
-    ['dwayne',    'duane'],
-    ['martha',    'marhta'],
-    ['kitten',    'sitting'],
-    ['mailbox',   'boxmail'],
-    ['mailbox',   'alimbox'],
-    ['dixon',     'dicksonx'],
-    ['jellyfish', 'smellyfish'],
-]
-
-
-const SAMPLE2 = [
-    ['aaaaaaa', '0000000'],
-    ['bbbbbbb', '1111111'],
-    ['ccccccc', '2222222'],
-    ['ddddddd', '3333333'],
-    ['eeeeeee', '4444444'],
-    ['fffffff', '5555555'],
-    ['ggggggg', '6666666'],
-    ['hhhhhhh', '7777777'],
-    ['iiiiiii', '8888888'],
-    ['jjjjjjj', '9999999'],
-]
+const {SAMPLE_TYPOS, SAMPLE_UNRELATED, SAMPLE_ASSYMETRIC} = require('./samples')
 
 
 function run(fn) {
-    for (const [s1, s2] of SAMPLE2) {
+    for (const [s1, s2] of SAMPLE_TYPOS) {
         fn(s1, s2)
     }
 }
@@ -40,14 +13,18 @@ function run(fn) {
 
 new Suite()
     .add('eddie', () => {
-        run(eddie.levenshtein)
+        run(eddie.leven)
     })
     .add('leven', () => {
         run(leven)
     })
     .on('complete', function (event) {
+        const results = []
         this.forEach(bench => {
-            console.log(bench.toString())
+            const name = bench.name
+            const mean = Math.round(bench.stats.mean * 1e6 * 100) / 100 + ' μs'
+            results.push({name, mean})
         })
+        console.table(results)
     })
     .run()
